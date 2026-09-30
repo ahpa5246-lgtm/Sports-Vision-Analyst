@@ -1,0 +1,34 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sports-vision-analyst"
+version = "0.1.0"
+description = "Single-camera football analytics: detection, tracking, homography, pose, speed, distance, possession and formation estimation."
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [{name = "Sports Vision Analyst contributors"}]
+dependencies = [
+  "numpy>=1.26",
+  "opencv-python>=4.10",
+  "pandas>=2.2",
+]
+
+[project.optional-dependencies]
+vision = ["ultralytics>=8.3.0"]
+ui = ["streamlit>=1.40"]
+full = ["ultralytics>=8.3.0", "streamlit>=1.40"]
+dev = ["pytest>=8.3"]
+
+[project.scripts]
+sports-vision = "sports_vision.cli:main"
+sports-vision-calibrate = "sports_vision.calibrate:main"
+
+[tool.setuptools.packages.find]
+include = ["sports_vision*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
