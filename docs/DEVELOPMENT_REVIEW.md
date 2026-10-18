@@ -21,7 +21,7 @@ https://www.hudl.com/
 Web-text inspection is not a visual screenshot comparison. These sources are a starting shortlist, not completed visual evidence. Do not mark the comparative design gate passed. A missing or inaccessible visual reference remains an open item.
 
 ## Evidence and harsh self-review
-Three result-bundle unittest cases pass locally: results survive deleted working-directory cleanup, report traversal is rejected, and an oversized bundle is rejected before copying. `python -m compileall sports_vision tests` passes for the changed module and tests. The full repository suite remains delegated to CI because this workspace was reconstructed through the authorized GitHub API rather than a credentialed clone.
+Three result-bundle unittest cases pass locally: results survive deleted working-directory cleanup, report traversal is rejected, and an oversized bundle is rejected before copying. `python -m compileall sports_vision tests` passes for the changed module and tests. GitHub Actions run 39089719464 installed the project from `.[dev]`, passed the full six-test Pytest suite, and compiled `sports_vision` plus `app.py` on commit `e23d48d`. The run also reported GitHub's Node 20 action-runtime deprecation warning for `actions/checkout@v4` and `actions/setup-python@v5`; this is a maintenance item rather than a product-test failure.
 
 Full model inference and Streamlit interaction have not run. The 512 MiB limit is a safety ceiling, not a measured hosting recommendation; Streamlit and media decoding add overhead. Persistence still ends with the browser session.
 
