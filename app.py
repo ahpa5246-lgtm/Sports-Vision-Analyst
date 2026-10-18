@@ -71,6 +71,7 @@ else:
         c1.metric("Team 1 distance", f"{summary['team_distance_m']['1'] / 1000:.2f} km")
         c2.metric("Team 2 distance", f"{summary['team_distance_m']['2'] / 1000:.2f} km")
         c3.metric("Frames", summary["frames_processed"])
+        st.caption(f"Session result size: {result['size_bytes'] / (1024 * 1024):.1f} MB")
         st.caption("Distances depend on calibration and tracking quality; inspect footage before drawing conclusions.")
         st.download_button("Download tracking CSV", result["csv"], "tracking.csv", "text/csv")
         st.download_button("Download summary JSON", json.dumps(summary, indent=2), "summary.json", "application/json")
