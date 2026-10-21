@@ -23,11 +23,13 @@ Web-text inspection is not a visual screenshot comparison. These sources are a s
 ## Evidence and harsh self-review
 Three result-bundle unittest cases pass locally: results survive deleted working-directory cleanup, report traversal is rejected, and an oversized bundle is rejected before copying. `python -m compileall sports_vision tests` passes for the changed module and tests. GitHub Actions run 39089719464 installed the project from `.[dev]`, passed the full six-test Pytest suite, and compiled `sports_vision` plus `app.py` on commit `e23d48d`. The run also reported GitHub's Node 20 action-runtime deprecation warning for `actions/checkout@v4` and `actions/setup-python@v5`; this is a maintenance item rather than a product-test failure.
 
-Full model inference and Streamlit interaction have not run. The 512 MiB limit is a safety ceiling, not a measured hosting recommendation; Streamlit and media decoding add overhead. Persistence still ends with the browser session.
+A bounded real-model integration job now generates an eight-frame 320×192 MP4, uses a valid full-frame calibration, loads `yolo26n.pt`, runs ByteTrack on CPU, and detaches the annotated video, tracking CSV and summary JSON from the deleted temporary directory. It validates every exposed download as non-empty and keeps the detached bundle below the 512 MiB output ceiling. GitHub Actions run 39592316974 passed both the normal test job and `real-inference-smoke` on commit `338f03b`; the smoke step completed in seven seconds after dependency installation. The test emits exact peak RSS in its job output, but the available GitHub connector exposes job and step status rather than stdout, so this review does not invent or transcribe an unseen numeric value.
+
+Full-length football footage and Streamlit interaction have not run. The synthetic clip proves model loading, tracker execution, output encoding and post-cleanup download bytes; it does not prove player/ball accuracy or professional-match throughput. The 512 MiB limit remains an output-bundle guard, not a measured hosting recommendation; Streamlit and media decoding add overhead. Persistence still ends with the browser session.
 
 The Senior Skills example visual gate was run and correctly returned BLOCKED_UNVERIFIED_DESIGN; its draft lacks verified asset licenses. That result is framework evidence, not a project-specific visual pass. Actual screenshots, app-commit binding, keyboard/RTL checks, and task observations are required before release readiness.
 
 ## Next acceptance boundary
-Run a real small video with valid calibration, download every output across reruns, and measure process memory below the safety ceiling before public hosting.
+Preserve the exact peak-RSS value as an inspectable artifact, then exercise the Streamlit upload → analysis → Results/download journey across reruns with a short real football clip. Do not treat the synthetic smoke as accuracy evidence or approve public hosting from it.
 
 Rollback: revert this milestone branch before merge. Do not merge or deploy automatically. Future runs must inspect open PRs and continue this branch before creating duplicate work.

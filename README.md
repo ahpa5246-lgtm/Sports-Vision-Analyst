@@ -139,7 +139,16 @@ pip install -e ".[dev]"
 python -m pytest
 ```
 
-The unit tests cover metric homography, speed/distance accumulation with impossible-jump rejection, and formation estimation.
+The unit tests cover metric homography, speed/distance accumulation with impossible-jump rejection, formation estimation, and detached result bundles.
+
+Run the bounded real-model smoke test explicitly (it downloads `yolo26n.pt`, generates an eight-frame MP4, runs ByteTrack on CPU, validates the downloadable bundle after temporary cleanup, and prints peak RSS evidence):
+
+```bash
+pip install -e ".[vision,dev]"
+RUN_REAL_INFERENCE=1 python -m pytest -s -m integration tests/test_real_inference.py
+```
+
+This is pipeline plumbing evidence, not football detection-accuracy or full-match performance evidence.
 
 ## Project layout
 
