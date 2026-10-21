@@ -32,3 +32,6 @@ include = ["sports_vision*"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-q"
+markers = [
+  "integration: bounded real-model integration checks",
+]
