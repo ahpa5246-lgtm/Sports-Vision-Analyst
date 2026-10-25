@@ -24,6 +24,7 @@ jobs:
       RUN_REAL_INFERENCE: "1"
       PYTHONHASHSEED: "0"
       OMP_NUM_THREADS: "2"
+      REAL_INFERENCE_EVIDENCE_PATH: artifacts/real-inference-evidence.json
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -32,3 +33,29 @@ jobs:
       - run: python -m pip install --upgrade pip
       - run: pip install -e ".[vision,dev]"
       - run: python -m pytest -s -m integration tests/test_real_inference.py
+      - name: Validate real-inference evidence
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          path = Path("artifacts/real-inference-evidence.json")
+          evidence = json.loads(path.read_text(encoding="utf-8"))
+          expected_keys = {
+              "model", "tracker", "device", "frames_processed",
+              "download_names", "bundle_size_bytes", "peak_rss_bytes",
+          }
+          assert set(evidence) == expected_keys
+          assert evidence["frames_processed"] == 8
+          assert evidence["download_names"]
+          assert evidence["bundle_size_bytes"] > 0
+          assert evidence["peak_rss_bytes"] > 0
+          PY
+      - name: Upload real-inference evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: real-inference-evidence-${{ github.sha }}
+          path: artifacts/real-inference-evidence.json
+          if-no-files-found: error
+          retention-days: 14
