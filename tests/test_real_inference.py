@@ -16,12 +16,6 @@ from sports_vision.result_bundle import (
 )
 
 
-pytestmark = pytest.mark.skipif(
-    os.environ.get("RUN_REAL_INFERENCE") != "1",
-    reason="set RUN_REAL_INFERENCE=1 for the bounded model smoke test",
-)
-
-
 def _write_tiny_video(path: Path, *, frames: int = 8) -> None:
     width, height = 320, 192
     writer = cv2.VideoWriter(
@@ -39,7 +33,28 @@ def _write_tiny_video(path: Path, *, frames: int = 8) -> None:
         writer.release()
 
 
+def test_writes_inspectable_evidence_json(tmp_path: Path):
+    evidence = {
+        "model": "yolo26n.pt",
+        "tracker": "bytetrack.yaml",
+        "device": "cpu",
+        "frames_processed": 8,
+        "download_names": ["annotated.mp4", "summary.json", "tracking.csv"],
+        "bundle_size_bytes": 10_584,
+        "peak_rss_bytes": 1_157_881_856,
+    }
+    evidence_path = tmp_path / "nested" / "real-inference-evidence.json"
+
+    _write_evidence(evidence_path, evidence)
+
+    assert json.loads(evidence_path.read_text(encoding="utf-8")) == evidence
+
+
 @pytest.mark.integration
+@pytest.mark.skipif(
+    os.environ.get("RUN_REAL_INFERENCE") != "1",
+    reason="set RUN_REAL_INFERENCE=1 for the bounded model smoke test",
+)
 def test_real_yolo26n_bytetrack_produces_downloadable_bundle_with_memory_evidence():
     import resource
 
