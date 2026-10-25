@@ -16,6 +16,14 @@ from sports_vision.result_bundle import (
 )
 
 
+def _write_evidence(path: Path, evidence: dict) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(
+        json.dumps(evidence, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+
+
 def _write_tiny_video(path: Path, *, frames: int = 8) -> None:
     width, height = 320, 192
     writer = cv2.VideoWriter(
@@ -106,4 +114,6 @@ def test_real_yolo26n_bytetrack_produces_downloadable_bundle_with_memory_evidenc
         "bundle_size_bytes": bundle["size_bytes"],
         "peak_rss_bytes": peak_rss_bytes,
     }
+    if evidence_path := os.environ.get("REAL_INFERENCE_EVIDENCE_PATH"):
+        _write_evidence(Path(evidence_path), evidence)
     print("REAL_INFERENCE_EVIDENCE=" + json.dumps(evidence, sort_keys=True))
