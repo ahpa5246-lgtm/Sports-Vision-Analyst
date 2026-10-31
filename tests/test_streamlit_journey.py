@@ -119,14 +119,14 @@ def test_streamlit_real_football_upload_results_downloads_and_reruns(tmp_path: P
                     page.wait_for_function(
                         """() => {
                           const element = document.querySelector("video");
-                          return element && element.readyState >= 2 && element.currentTime > 0;
+                          return element && element.readyState >= 2 && element.currentTime >= 0.5;
                         }""",
                         timeout=15_000,
                     )
                     playback = video_player.first.evaluate(
                         """(element) => {
                           const result = {
-                            played: element.currentTime > 0,
+                            played: element.currentTime >= 0.5,
                             currentTime: element.currentTime,
                             readyState: element.readyState,
                             error: element.error ? element.error.message : null
@@ -135,7 +135,7 @@ def test_streamlit_real_football_upload_results_downloads_and_reruns(tmp_path: P
                           return result;
                         }"""
                     )
-                    assert playback["played"], f"Annotated video preview did not play: {playback}"
+                    assert playback["played"], f"Annotated video preview did not advance for 0.5s: {playback}"
                     assert playback["readyState"] >= 2, f"Annotated video was not ready: {playback}"
                     page.screenshot(
                         path=str(evidence_dir / "results-desktop.png"),
@@ -151,7 +151,30 @@ def test_streamlit_real_football_upload_results_downloads_and_reruns(tmp_path: P
                     expect(page.locator("video")).to_have_count(1)
 
                     page.set_viewport_size({"width": 768, "height": 900})
-                    page.wait_for_timeout(500)
+                    video_player.first.evaluate(
+                        "(element) => { element.currentTime = 0; element.muted = true; return element.play(); }"
+                    )
+                    page.wait_for_function(
+                        """() => {
+                          const element = document.querySelector("video");
+                          return element && element.readyState >= 2 && element.currentTime >= 0.5;
+                        }""",
+                        timeout=15_000,
+                    )
+                    narrow_playback = video_player.first.evaluate(
+                        """(element) => {
+                          const result = {
+                            played: element.currentTime >= 0.5,
+                            currentTime: element.currentTime,
+                            readyState: element.readyState,
+                            error: element.error ? element.error.message : null
+                          };
+                          element.pause();
+                          return result;
+                        }"""
+                    )
+                    assert narrow_playback["played"], f"Narrow video preview did not advance for 0.5s: {narrow_playback}"
+                    assert narrow_playback["readyState"] >= 2, f"Narrow video preview was not ready: {narrow_playback}"
                     narrow_overflow = page.evaluate(
                         "() => document.documentElement.scrollWidth > window.innerWidth"
                     )
@@ -202,6 +225,7 @@ def test_streamlit_real_football_upload_results_downloads_and_reruns(tmp_path: P
                         },
                         "video_preview": preview,
                         "video_playback": playback,
+                        "narrow_video_playback": narrow_playback,
                         "rerun_preserved_result": True,
                         "narrow_horizontal_overflow": bool(narrow_overflow),
                         "viewports": ["1440x1000", "768x900"],
