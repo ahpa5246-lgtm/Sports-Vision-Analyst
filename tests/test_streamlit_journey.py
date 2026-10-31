@@ -137,7 +137,7 @@ def test_streamlit_real_football_upload_results_downloads_and_reruns(tmp_path: P
                     expect(
                         page.get_by_text("Map the pitch before measuring movement", exact=True)
                     ).to_be_visible()
-                    page.get_by_role("radio", name="Results").click()
+                    page.get_by_text("Results", exact=True).click()
                     expect(page.get_by_role("heading", name="Match results")).to_be_visible()
                     expect(page.locator("video")).to_have_count(1)
 
