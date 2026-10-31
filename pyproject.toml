@@ -21,6 +21,7 @@ vision = ["ultralytics>=8.3.0"]
 ui = ["streamlit>=1.40"]
 full = ["ultralytics>=8.3.0", "streamlit>=1.40"]
 dev = ["pytest>=8.3"]
+ui-test = ["playwright>=1.50"]
 
 [project.scripts]
 sports-vision = "sports_vision.cli:main"

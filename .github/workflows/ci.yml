@@ -19,7 +19,7 @@ jobs:
 
   real-inference-smoke:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
     env:
       RUN_REAL_INFERENCE: "1"
       PYTHONHASHSEED: "0"
@@ -31,8 +31,64 @@ jobs:
         with:
           python-version: "3.11"
       - run: python -m pip install --upgrade pip
-      - run: pip install -e ".[vision,dev]"
+      - run: pip install -e ".[full,dev,ui-test]"
       - run: python -m pytest -s -m integration tests/test_real_inference.py
+      - name: Install Chromium for the Streamlit browser journey
+        run: python -m playwright install --with-deps chromium
+      - name: Download and prepare licensed real-football footage
+        run: |
+          mkdir -p artifacts/ui
+          if ! command -v ffmpeg >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install -y ffmpeg
+          fi
+          curl --fail --location --retry 3 --retry-delay 2 \
+            --user-agent "Sports-Vision-Analyst-CI/1.0" \
+            --output /tmp/street-football-2.webm \
+            https://upload.wikimedia.org/wikipedia/commons/d/d7/Street_football_2.webm
+          ffmpeg -hide_banner -loglevel error -y \
+            -ss 2 -i /tmp/street-football-2.webm -t 2 \
+            -vf "fps=8,scale=640:360" -an \
+            -frames:v 16 -c:v libx264 -preset veryfast -pix_fmt yuv420p -movflags +faststart \
+            /tmp/real-football.mp4
+          python - <<'PY'
+          import hashlib
+          import json
+          from pathlib import Path
+
+          source = Path("/tmp/street-football-2.webm")
+          prepared = Path("/tmp/real-football.mp4")
+          calibration = {
+              "pitch_length_m": 105.0,
+              "pitch_width_m": 68.0,
+              "image_points": [[0, 0], [639, 0], [639, 359], [0, 359]],
+              "field_points": [[0, 0], [105, 0], [105, 68], [0, 68]],
+          }
+          Path("/tmp/real-football-calibration.json").write_text(
+              json.dumps(calibration, indent=2) + "\\n", encoding="utf-8"
+          )
+          attribution = {
+              "source_url": "https://commons.wikimedia.org/wiki/File:Street_football_2.webm",
+              "creator": "Anasskoko",
+              "license": "Creative Commons Attribution-ShareAlike 4.0 International",
+              "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+              "source_sha256": hashlib.sha256(source.read_bytes()).hexdigest(),
+              "prepared_clip_sha256": hashlib.sha256(prepared.read_bytes()).hexdigest(),
+              "source_size_bytes": source.stat().st_size,
+              "prepared_clip_size_bytes": prepared.stat().st_size,
+              "changes": "Two-second excerpt beginning at 2s, transcoded from VP8 WebM to H.264 MP4, resized to 640x360 at 8 fps, without audio. Screenshots may contain frames from this CC BY-SA clip; the source video and annotated output are not uploaded.",
+          }
+          Path("artifacts/ui/attribution.json").write_text(
+              json.dumps(attribution, indent=2) + "\\n", encoding="utf-8"
+          )
+          PY
+      - name: Exercise upload, analysis, results, reruns and downloads in Streamlit
+        env:
+          RUN_STREAMLIT_UI: "1"
+          REAL_FOOTBALL_CLIP: /tmp/real-football.mp4
+          REAL_FOOTBALL_CALIBRATION: /tmp/real-football-calibration.json
+          UI_EVIDENCE_DIR: artifacts/ui
+        run: python -m pytest -s -m integration tests/test_streamlit_journey.py
       - name: Validate real-inference evidence
         run: |
           python - <<'PY'
@@ -55,7 +111,9 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: real-inference-evidence-${{ github.sha }}
-          path: artifacts/real-inference-evidence.json
+          name: real-inference-and-ui-evidence-${{ github.sha }}
+          path: |
+            artifacts/real-inference-evidence.json
+            artifacts/ui/
           if-no-files-found: error
           retention-days: 14
