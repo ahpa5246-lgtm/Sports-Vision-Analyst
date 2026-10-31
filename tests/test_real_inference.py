@@ -47,7 +47,7 @@ def test_writes_inspectable_evidence_json(tmp_path: Path):
         "tracker": "bytetrack.yaml",
         "device": "cpu",
         "frames_processed": 8,
-        "download_names": ["annotated.mp4", "summary.json", "tracking.csv"],
+        "download_names": ["annotated.webm", "summary.json", "tracking.csv"],
         "bundle_size_bytes": 10_584,
         "peak_rss_bytes": 1_157_881_856,
     }
@@ -92,13 +92,15 @@ def test_real_yolo26n_bytetrack_produces_downloadable_bundle_with_memory_evidenc
     # The source and output directory are gone: this mirrors a Streamlit rerun.
     summary_bytes = json.dumps(bundle["summary"], indent=2).encode("utf-8")
     downloads = {
-        "annotated.mp4": bundle["video"],
+        bundle["video_filename"]: bundle["video"],
         "tracking.csv": bundle["csv"],
         "summary.json": summary_bytes,
         **{name: content for name, content in bundle["reports"]},
     }
     assert summary["frames_processed"] == frame_count
-    assert downloads["annotated.mp4"]
+    assert summary["outputs"]["annotated_video"] == "annotated.webm"
+    assert bundle["video_mime_type"] == "video/webm"
+    assert downloads["annotated.webm"]
     assert downloads["tracking.csv"].startswith(b"frame,time_s,")
     assert json.loads(downloads["summary.json"])["frames_processed"] == frame_count
     assert all(content for content in downloads.values())

@@ -115,19 +115,28 @@ def test_streamlit_real_football_upload_results_downloads_and_reruns(tmp_path: P
                     preview = video_player.first.evaluate(
                         "(element) => ({src: element.currentSrc || element.src, readyState: element.readyState, duration: Number.isFinite(element.duration) ? element.duration : null})"
                     )
+                    video_player.first.evaluate("(element) => { element.muted = true; return element.play(); }")
+                    page.wait_for_function(
+                        """() => {
+                          const element = document.querySelector("video");
+                          return element && element.readyState >= 2 && element.currentTime > 0;
+                        }""",
+                        timeout=15_000,
+                    )
                     playback = video_player.first.evaluate(
-                        """async (element) => {
-                          try {
-                            await element.play();
-                            await new Promise((resolve) => setTimeout(resolve, 350));
-                            const currentTime = element.currentTime;
-                            element.pause();
-                            return {played: currentTime > 0, currentTime, readyState: element.readyState, error: null};
-                          } catch (error) {
-                            return {played: false, currentTime: element.currentTime, readyState: element.readyState, error: String(error)};
-                          }
+                        """(element) => {
+                          const result = {
+                            played: element.currentTime > 0,
+                            currentTime: element.currentTime,
+                            readyState: element.readyState,
+                            error: element.error ? element.error.message : null
+                          };
+                          element.pause();
+                          return result;
                         }"""
                     )
+                    assert playback["played"], f"Annotated video preview did not play: {playback}"
+                    assert playback["readyState"] >= 2, f"Annotated video was not ready: {playback}"
                     page.screenshot(
                         path=str(evidence_dir / "results-desktop.png"),
                         full_page=True,
@@ -161,7 +170,7 @@ def test_streamlit_real_football_upload_results_downloads_and_reruns(tmp_path: P
 
                     tracking_path = save_download("Download tracking CSV", "tracking.csv")
                     summary_path = save_download("Download summary JSON", "summary.json")
-                    annotated_path = save_download("Download annotated video", "annotated.mp4")
+                    annotated_path = save_download("Download annotated video", "annotated.webm")
 
                     csv_lines = tracking_path.read_text(encoding="utf-8").splitlines()
                     assert csv_lines and csv_lines[0].startswith("frame,time_s,")
@@ -189,7 +198,7 @@ def test_streamlit_real_football_upload_results_downloads_and_reruns(tmp_path: P
                         "download_sizes_bytes": {
                             "tracking.csv": tracking_path.stat().st_size,
                             "summary.json": summary_path.stat().st_size,
-                            "annotated.mp4": annotated_path.stat().st_size,
+                            "annotated.webm": annotated_path.stat().st_size,
                         },
                         "video_preview": preview,
                         "video_playback": playback,

@@ -6,7 +6,7 @@ A working single-camera football analytics pipeline. It detects and tracks playe
 
 For every analyzed match the pipeline writes:
 
-- `annotated.mp4` — tracked players, IDs, team, speed and tactical mini-map.
+- `annotated.webm` — browser-playable VP9/VP8 video with tracked players, IDs, team, speed and tactical mini-map.
 - `tracking.csv` — frame/time/track/team/metric x-y/speed/distance/confidence/bounding box.
 - `summary.json` — team distance, possession estimate, player totals/top speed and dominant formation.
 - `team_1_heatmap.png`, `team_2_heatmap.png` — spatial occupancy heatmaps when team samples exist.

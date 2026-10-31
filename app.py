@@ -66,7 +66,7 @@ else:
         st.info("No completed analysis yet. Open Analyze to upload a match and calibration.")
     else:
         summary = result["summary"]
-        st.video(result["video"])
+        st.video(result["video"], format=result["video_mime_type"])
         c1, c2, c3 = st.columns(3)
         c1.metric("Team 1 distance", f"{summary['team_distance_m']['1'] / 1000:.2f} km")
         c2.metric("Team 2 distance", f"{summary['team_distance_m']['2'] / 1000:.2f} km")
@@ -75,7 +75,7 @@ else:
         st.caption("Distances depend on calibration and tracking quality; inspect footage before drawing conclusions.")
         st.download_button("Download tracking CSV", result["csv"], "tracking.csv", "text/csv")
         st.download_button("Download summary JSON", json.dumps(summary, indent=2), "summary.json", "application/json")
-        st.download_button("Download annotated video", result["video"], "annotated.mp4", "video/mp4")
+        st.download_button("Download annotated video", result["video"], result["video_filename"], result["video_mime_type"])
         for name, content in result["reports"]:
             st.image(content, caption=name)
         with st.expander("Raw analysis summary"):

@@ -22,7 +22,21 @@ def collect_results(
         raise ValueError("Result memory budget must be positive")
 
     root = output.resolve()
-    video_path = _safe_output_file(root, "annotated.mp4")
+    video_name = summary["outputs"].get("annotated_video")
+    if (
+        not isinstance(video_name, str)
+        or not video_name
+        or "/" in video_name
+        or "\\" in video_name
+    ):
+        raise ValueError("Annotated video filename must be a simple output filename")
+    video_path = _safe_output_file(root, video_name)
+    video_mime_type = {
+        ".webm": "video/webm",
+        ".mp4": "video/mp4",
+    }.get(video_path.suffix.lower())
+    if video_mime_type is None:
+        raise ValueError("Annotated video must use a supported .webm or .mp4 extension")
     csv_path = _safe_output_file(root, "tracking.csv")
     report_paths = [
         (str(name), _safe_output_file(root, str(name)))
@@ -40,6 +54,8 @@ def collect_results(
     return {
         "summary": deepcopy(summary),
         "video": video_path.read_bytes(),
+        "video_filename": video_path.name,
+        "video_mime_type": video_mime_type,
         "csv": csv_path.read_bytes(),
         "reports": reports,
         "size_bytes": total_bytes,
