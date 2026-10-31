@@ -17,7 +17,7 @@ def _wait_for_streamlit(process: subprocess.Popen, log_path: Path) -> None:
     for _ in range(90):
         if process.poll() is not None:
             detail = log_path.read_text(encoding="utf-8", errors="replace")[-5000:]
-            raise RuntimeError(f"Streamlit exited before becoming healthy:\\n{detail}")
+            raise RuntimeError(f"Streamlit exited before becoming healthy:\n{detail}")
         try:
             with urlopen(health_url, timeout=2) as response:
                 if response.status == 200:
@@ -26,7 +26,7 @@ def _wait_for_streamlit(process: subprocess.Popen, log_path: Path) -> None:
             pass
         time.sleep(1)
     detail = log_path.read_text(encoding="utf-8", errors="replace")[-5000:]
-    raise TimeoutError(f"Streamlit did not become healthy within 90 seconds:\\n{detail}")
+    raise TimeoutError(f"Streamlit did not become healthy within 90 seconds:\n{detail}")
 
 
 @pytest.mark.integration
@@ -108,8 +108,8 @@ def test_streamlit_real_football_upload_results_downloads_and_reruns(tmp_path: P
                         full_page=True,
                     )
 
-                    page.get_by_role("radio", name="Results").click()
-                    expect(page.get_by_role("heading", name="Match results")).to_be_visible()
+                    page.get_by_text("Results", exact=True).click()
+                    expect(page.get_by_text("Match results", exact=True)).to_be_visible()
                     video_player = page.locator("video")
                     expect(video_player).to_have_count(1)
                     preview = video_player.first.evaluate(
@@ -133,9 +133,9 @@ def test_streamlit_real_football_upload_results_downloads_and_reruns(tmp_path: P
                         full_page=True,
                     )
 
-                    page.get_by_role("radio", name="Calibration guide").click()
+                    page.get_by_text("Calibration guide", exact=True).click()
                     expect(
-                        page.get_by_role("heading", name="Map the pitch before measuring movement")
+                        page.get_by_text("Map the pitch before measuring movement", exact=True)
                     ).to_be_visible()
                     page.get_by_role("radio", name="Results").click()
                     expect(page.get_by_role("heading", name="Match results")).to_be_visible()
@@ -154,7 +154,7 @@ def test_streamlit_real_football_upload_results_downloads_and_reruns(tmp_path: P
                     def save_download(label: str, filename: str) -> Path:
                         target = tmp_path / filename
                         with page.expect_download(timeout=60_000) as download_info:
-                            page.get_by_role("button", name=label).click()
+                            page.get_by_text(label, exact=True).click()
                         download_info.value.save_as(str(target))
                         assert target.is_file() and target.stat().st_size > 0
                         return target
@@ -205,7 +205,7 @@ def test_streamlit_real_football_upload_results_downloads_and_reruns(tmp_path: P
                         ],
                     }
                     (evidence_dir / "results.json").write_text(
-                        json.dumps(evidence, indent=2) + "\\n",
+                        json.dumps(evidence, indent=2) + "\n",
                         encoding="utf-8",
                     )
                 finally:

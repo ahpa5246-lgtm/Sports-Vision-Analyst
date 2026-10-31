@@ -65,7 +65,7 @@ jobs:
               "field_points": [[0, 0], [105, 0], [105, 68], [0, 68]],
           }
           Path("/tmp/real-football-calibration.json").write_text(
-              json.dumps(calibration, indent=2) + "\\n", encoding="utf-8"
+              json.dumps(calibration, indent=2) + "\n", encoding="utf-8"
           )
           attribution = {
               "source_url": "https://commons.wikimedia.org/wiki/File:Street_football_2.webm",
@@ -79,7 +79,7 @@ jobs:
               "changes": "Two-second excerpt beginning at 2s, transcoded from VP8 WebM to H.264 MP4, resized to 640x360 at 8 fps, without audio. Screenshots may contain frames from this CC BY-SA clip; the source video and annotated output are not uploaded.",
           }
           Path("artifacts/ui/attribution.json").write_text(
-              json.dumps(attribution, indent=2) + "\\n", encoding="utf-8"
+              json.dumps(attribution, indent=2) + "\n", encoding="utf-8"
           )
           PY
       - name: Exercise upload, analysis, results, reruns and downloads in Streamlit
