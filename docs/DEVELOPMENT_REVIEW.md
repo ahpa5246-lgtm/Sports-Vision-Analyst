@@ -37,3 +37,49 @@ The Senior Skills example visual gate was run and correctly returned BLOCKED_UNV
 Exercise the Streamlit upload → analysis → Results/download journey across reruns with a short real football clip. Capture actual app screenshots and task observations before comparative visual approval. Do not treat the synthetic smoke as accuracy evidence or approve public hosting from its RSS value.
 
 Rollback: revert this milestone branch before merge. Do not merge or deploy automatically. Future runs must inspect open PRs and continue this branch before creating duplicate work.
+
+## Verification update — 2026-10-31
+
+Scope: existing draft PR #2, branch `codex/persistent-analysis-workspace`, verified head before this documentation update: `50d9e1055187f519459bc3408fdbbedae6cbb6d8`.
+
+### CI and functional evidence
+
+| Check | Observed result |
+| --- | --- |
+| Streamlit browser journey | Passed on Chromium at 1440×1000 and 768×900 |
+| Upload → analyze → results → clear | Passed with a real licensed two-second football clip |
+| Annotated video playback | Passed at both widths; desktop currentTime 0.5178s, narrow currentTime 0.5128s, readyState 4, no media error |
+| Result persistence across Streamlit rerun | Passed |
+| Narrow horizontal overflow | False |
+| Real-model smoke | Passed on CPU with YOLO26n + ByteTrack; 8 frames processed |
+| Browser journey inference evidence | 16 frames processed; 67 tracking rows |
+| Peak RSS in real-model smoke | 1,198,711,880 bytes |
+| CI runs | [push run 41229687215](https://github.com/ahpa5246-lgtm/Sports-Vision-Analyst/actions/runs/41229687215) and [pull-request run 41229690908](https://github.com/ahpa5246-lgtm/Sports-Vision-Analyst/actions/runs/41229690908): both passed |
+
+The browser evidence artifact records a CC BY-SA 4.0 Wikimedia Commons source clip, its SHA-256, the prepared clip hash, frame counts, download sizes and viewport screenshots. Neither the source clip nor the annotated output video is uploaded. The annotated download is now `annotated.webm`; the result bundle carries the correct `video/webm` MIME type.
+
+### Defect found and corrected
+
+The previous `mp4v` output rendered an HTML video element but Chromium rejected playback with `NotSupportedError`. A screenshot of the player was therefore not evidence of working playback. The pipeline now prefers VP9 WebM and falls back to VP8 WebM; the result bundle validates the filename and derives the MIME type. Browser acceptance now requires at least 0.5 seconds of actual playback at both desktop and narrow widths. The resulting evidence reports 0.5178s and 0.5128s respectively, with `readyState=4` and no media error.
+
+### User journeys and visual comparison
+
+The application keeps three distinct destinations: **Analyze** (upload and run), **Results** (video, pitch overlay, metrics and downloads), and **Calibration guide** (instructions for the current CLI calibration path). The separation is coherent for the current local, single-camera scope, but the calibration destination is documentation rather than an in-app guided calibration workflow.
+
+Reviewed published product interfaces:
+
+- [Hudl Sportscode](https://www.hudl.com/products/sportscode) — its official coding-window capture combines video, a synchronized timeline, player/event buttons and structured coding output. The current app has a working annotated video and pitch overlay, but no event-coding timeline or linked player/event report.
+- [Kinovea](https://www.kinovea.org/) — its official analysis and measurement screens prioritize frame navigation, video annotation, measurement overlays, synchronized comparison and export. The current app has a useful overlay and downloadable CSV, but lacks manual annotation, frame-by-frame review controls and side-by-side video comparison.
+- Official visual/product reference: [FIFA Football Data Platform](https://inside.fifa.com/innovation/innovating-the-game/football-data-platform). FIFA describes a unified analysis environment with multiple visualizations and data/video synchronization. This is a reference for keeping match data, video and analysis in one coherent workspace, not a feature-equivalence claim.
+
+The current UI is a functional Streamlit prototype rather than a visual match for those professional tools. The next meaningful UI milestone should address the analysis workflow (timeline/event inspection and guided calibration) rather than a color-only redesign.
+
+### Remaining limitations
+
+- The real-model check uses a short, low-resolution sample; it does not validate full-match throughput or tracking accuracy across representative camera angles, occlusion, lighting and pitch conditions.
+- Calibration is still a CLI workflow; the in-app guide does not perform calibration.
+- No side-by-side comparison, manual telestration or event timeline is implemented.
+- The current 768px viewport check is a narrow-browser check, not a complete mobile-device or assistive-technology audit.
+- The two workflow triggers currently run equivalent CI on both push and pull_request events; this consumes duplicate CI time and should be consolidated in a separate workflow-only change.
+
+No merge, deployment or production claim was made. PR #2 remains a draft.
