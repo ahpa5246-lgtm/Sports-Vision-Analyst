@@ -83,3 +83,18 @@ The current UI is a functional Streamlit prototype rather than a visual match fo
 - The two workflow triggers currently run equivalent CI on both push and pull_request events; this consumes duplicate CI time and should be consolidated in a separate workflow-only change.
 
 No merge, deployment or production claim was made. PR #2 remains a draft.
+
+## 2026-11-01 — CI trigger scope and fresh end-to-end evidence
+
+### Workflow trigger correction
+The workflow change at branch commit `479ee19e79e26b7592218c87972f5629cc350eb5` scopes `push` to `main` and `pull_request` to PRs targeting `main`. Feature-branch pushes therefore do not start a second workflow alongside the PR checks. A later push to `main` remains a separate post-merge validation event; the two events are not interchangeable because they validate different refs. This supersedes the earlier blanket statement that every feature-branch push and pull-request update duplicated the same CI run.
+
+### Current PR-head evidence
+- PR head: `479ee19e79e26b7592218c87972f5629cc350eb5`.
+- Pull-request workflow run [41241290173](https://github.com/ahpa5246-lgtm/Sports-Vision-Analyst/actions/runs/41241290173): both jobs passed.
+- `test`: dependency installation, Pytest and compileall passed; Pytest reported 9 passed and 2 skipped. The skips remain visible and are not counted as passes.
+- `real-inference-smoke`: real YOLO26n + ByteTrack CPU inference passed on 8 generated frames; the result bundle contained `annotated.webm`, `summary.json` and `tracking.csv` (2,930 bytes); measured peak RSS was 1,200,328,704 bytes.
+- The licensed-footage Streamlit browser journey passed, including upload, analysis, results, rerun and downloads. Evidence artifact [13057736521](https://github.com/ahpa5246-lgtm/Sports-Vision-Analyst/actions/runs/41241290173/artifacts/13057736521) was uploaded (624,735 bytes).
+
+### Limits unchanged
+This run verifies pipeline execution and the short browser journey, not full-match detection accuracy, player identity, broadcast-camera robustness or match-scale throughput. It does not implement in-app point selection/calibration, event timeline, manual telestration or side-by-side comparison. Hudl Sportscode and Kinovea remain the direct released-product references; FIFA Football Data Platform remains the official aspirational reference. The comparative review is task-level and the visual-quality gate remains unpassed until the actual app screenshots are bound to the implementation audit and inspected as required. No merge or deployment.
