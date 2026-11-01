@@ -206,7 +206,7 @@ def test_streamlit_real_football_upload_results_downloads_and_reruns(tmp_path: P
                         full_page=True,
                     )
 
-                    page.get_by_role("radio", name="Frame review").check()
+                    select_review_mode("Frame review")
                     expect(page.get_by_text("Selected frame", exact=True)).to_be_visible()
                     expect(page.get_by_role("combobox", name="Track ID")).to_be_visible()
                     expect(page.locator('[data-testid="stDataFrame"]')).to_be_visible()
@@ -218,7 +218,7 @@ def test_streamlit_real_football_upload_results_downloads_and_reruns(tmp_path: P
                         path=str(evidence_dir / "frame-review-narrow.png"),
                         full_page=True,
                     )
-                    page.get_by_role("radio", name="Video playback").check()
+                    select_review_mode("Video playback")
 
                     def save_download(label: str, filename: str) -> Path:
                         target = tmp_path / filename

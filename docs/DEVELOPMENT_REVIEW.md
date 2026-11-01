@@ -190,3 +190,19 @@ PR #2 remained Draft and was not ready for measurement-integrity sign-off at tha
 - The P1 accumulator-state corruption path is covered and green on PR #2. This does not establish full-match detector/tracker accuracy, player identity, calibration accuracy, or representative camera robustness.
 - PR #3 was subsequently narrowed to documentation-only at head `56120d305a51b429ccd444b133cd438eaf467419`; `sports_vision/analytics.py` now matches `main`, and `tests/test_measurement_integrity.py` is absent from that branch. Its current-head CI run [41309250371](https://github.com/ahpa5246-lgtm/Sports-Vision-Analyst/actions/runs/41309250371) passed. The guard and regression tests now exist only on this active feature branch.
 - In-app calibration, event timeline, manual telestration, synchronized side-by-side comparison, screen-reader/keyboard audit and full-match ground-truth evaluation remain open.
+
+
+## 2026-11-01 — narrow Frame review radio interaction repair (validation pending)
+
+### Failure-first review
+- Current PR #2 head before this repair: `c2f69208207a7feddaa8ef8d0e4c1f207282cf35`.
+- GitHub Actions run [41323604500](https://github.com/ahpa5246-lgtm/Sports-Vision-Analyst/actions/runs/41323604500) failed in the `real-inference-smoke` job at **Exercise upload, analysis, results, reruns and downloads in Streamlit**. The separate unit-test/compile job passed, and the eight-frame real-inference smoke passed.
+- The test source showed that the desktop review-mode path used the visible-label helper, but the later 768px narrow path still called Playwright `.check()` directly on Streamlit radio inputs. The same visible-label helper is now used for both narrow-mode transitions. This is a test-interaction correction; no production application or analytics code changed.
+- The connector exposed the failed job and step but not its Playwright stack trace. The diagnosis is therefore code-based; the new current-head browser run is the acceptance authority.
+
+### Repair and pending evidence
+- Replaced both remaining direct radio `.check()` calls in the narrow journey with `select_review_mode(...)`, which clicks the visible option label and asserts the selected radio state.
+- The journey still verifies Frame review content, Track ID selection, dataframe visibility, and no horizontal overflow at 768px.
+- **Validation pending:** the new commit must pass the full unit/compile job, real inference smoke, and the complete Streamlit browser journey. Do not mark this repair green until the new run and its screenshot artifact are inspected.
+
+No merge or deployment. Keep PR #2 Draft.
