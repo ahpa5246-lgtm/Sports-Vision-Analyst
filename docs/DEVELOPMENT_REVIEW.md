@@ -98,3 +98,38 @@ The workflow change at branch commit `479ee19e79e26b7592218c87972f5629cc350eb5` 
 
 ### Limits unchanged
 This run verifies pipeline execution and the short browser journey, not full-match detection accuracy, player identity, broadcast-camera robustness or match-scale throughput. It does not implement in-app point selection/calibration, event timeline, manual telestration or side-by-side comparison. Hudl Sportscode and Kinovea remain the direct released-product references; FIFA Football Data Platform remains the official aspirational reference. The comparative review is task-level and the visual-quality gate remains unpassed until the actual app screenshots are bound to the implementation audit and inspected as required. No merge or deployment.
+
+
+## 2026-11-01 — inspect current PR-head inference and UI evidence
+
+### Current-head CI and artifact binding
+- Reviewed PR #2 at branch head `f5952aadb01088f068fef66e8c6c6fc00072007b`; the PR remains open and Draft.
+- GitHub Actions PR run [41246081081](https://github.com/ahpa5246-lgtm/Sports-Vision-Analyst/actions/runs/41246081081) completed successfully. Both `test` and `real-inference-smoke` jobs passed, including the licensed-footage Streamlit browser journey.
+- Artifact [13058613434](https://github.com/ahpa5246-lgtm/Sports-Vision-Analyst/actions/runs/41246081081/artifacts/13058613434), `real-inference-and-ui-evidence-f38ade63da8856672351a2341a5c54e55660423c`, was downloaded and inspected. Archive size: 625,659 bytes; GitHub artifact digest: `sha256:53b51638cf5f5e721504f61115a839fff3588a34e9d35acbc557d2a3994b123e`. It contains the real-inference JSON, five UI screenshots, attribution JSON, results JSON, and the Streamlit log.
+
+### Real-model smoke evidence
+- Model: `yolo26n.pt`; tracker: `bytetrack.yaml`; device: CPU.
+- Eight generated frames were processed. The downloadable bundle contained `annotated.webm`, `summary.json`, and `tracking.csv`, totaling 2,930 bytes.
+- Recorded peak RSS: 1,195,126,784 bytes on this GitHub runner.
+- This remains a bounded model/tracker plumbing check. It is not full-match accuracy, ball detection, identity verification, broadcast-camera robustness, or a hosting-memory recommendation.
+
+### Browser journey and inspected screenshots
+- The real licensed Wikimedia Commons clip was prepared from [Street football 2](https://commons.wikimedia.org/wiki/File:Street_football_2.webm) by Anasskoko under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). The artifact records source and prepared-clip SHA-256 values and the exact two-second, 640×360, 8-fps, audio-free transformation.
+- The Streamlit journey processed 16 frames and produced 67 tracking rows. It verified Analyze upload → analysis completion → Results → Calibration guide → Results → downloads → Clear results.
+- Downloads were nonempty: `tracking.csv` 4,888 bytes, `summary.json` 2,545 bytes, and `annotated.webm` 207,327 bytes.
+- Actual Chromium playback advanced 0.5238 seconds at 1440×1000 and 0.5077 seconds at 768×900; both reported `readyState=4` and no media error. The Streamlit rerun preserved the result, and the 768px page had no horizontal overflow.
+- I inspected `analyze-uploaded.png`, `analyze-complete.png`, `results-desktop.png`, `results-narrow.png`, and `results-cleared.png`. The screenshots are bound to this PR-head workflow artifact, not to a local mock. The Calibration guide was visited by the test but no dedicated screenshot was captured, so its visual hierarchy is not yet evidenced.
+- The initial video-element snapshot recorded `readyState=0` before playback was requested; the subsequent measured playback above is the acceptance result. Do not interpret the pre-playback snapshot as a failed video.
+
+### Updated product comparison and observed gaps
+- [Hudl Sportscode](https://www.hudl.com/products/sportscode) remains the direct coding-workflow reference: its official product material shows synchronized video, a timeline, coding buttons and structured player/event output. The current Results screenshot is dominated by one annotated video and three aggregate metrics; there is no synchronized event timeline or player/event coding surface.
+- [Kinovea](https://www.kinovea.org/) remains the direct analysis/measurement reference: its released interface emphasizes frame navigation, measurement overlays, annotation and synchronized comparison. The current app proves playable annotated output and downloads, but the screenshot shows no frame-step/scrub controls, manual telestration or side-by-side comparison.
+- [FIFA Football Data Platform](https://inside.fifa.com/innovation/innovating-the-game/football-data-platform) remains the official aspirational reference for coherent match data, video and analysis. The current prototype is narrower and should not imply feature equivalence.
+- The inspected 1440×1000 and 768×900 Results screens preserve the video without horizontal overflow, but the video consumes most of the first view and the three metrics remain the only visible summary. The Analyze screen has a clear upload/action sequence and collapsible detection settings. The Calibration guide is still CLI instructions rather than an in-app calibration workflow.
+- Decision: do not add decorative polish. The next product milestone should be a bounded frame-review workflow using the existing annotated video and tracking output, with explicit frame/time selection and a useful player/track detail view. Do not label tracks as verified player identities or invent semantic events from raw tracking rows. Guided point calibration remains a separate later milestone because it changes the data-entry and homography workflow.
+
+### Remaining limits
+- No full-match footage, ground-truth annotations, ball detection, accuracy benchmark, repeated camera-angle evaluation, or real-user study was performed.
+- No in-app calibration editor, event timeline, manual annotation, synchronized side-by-side comparison, or screen-reader/keyboard audit is established by this artifact.
+- The screenshots verify the tested Streamlit journey only. They do not pass the full comparative visual-quality gate or establish release readiness.
+- No merge or deployment.
