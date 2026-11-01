@@ -155,8 +155,8 @@ This run verifies pipeline execution and the short browser journey, not full-mat
 - PR #3 also changes `README.md`, adds `docs/QUALITY_REVIEW.md` and `docs/project-overview.svg`; it is not a two-file patch that can be blindly merged into PR #2.
 - Do not copy the guard/tests into PR #2 while the existing PR #3 remains the source of the same fix. Reconcile the two existing branches so the guard and regression tests land exactly once, then rerun the unit suite, real-inference smoke and Streamlit browser acceptance on the resulting PR #2 head.
 
-### Gate decision
-PR #2 remains Draft and is not ready for measurement-integrity sign-off. The passing CI above verifies the current declared jobs only; it does not close this P1 data-integrity blocker. No merge, deployment or duplicate implementation was performed.
+### Gate decision at the time of the initial review
+PR #2 remained Draft and was not ready for measurement-integrity sign-off at that snapshot. The blocker was subsequently addressed on the existing PR #2 branch; see the verified integration entry below. No merge or deployment was performed.
 
 
 ## 2026-11-01 — measurement integrity guard integrated into PR #2
@@ -173,9 +173,19 @@ PR #2 remains Draft and is not ready for measurement-integrity sign-off. The pas
 - Regression tests cover NaN/positive infinity timestamps, NaN/infinite coordinates, out-of-order samples, and preservation of the last accepted tracking state.
 
 ### Verification
-- Code and test commit created on `codex/persistent-analysis-workspace`; branch-head CI is pending at the time of this entry. Do not treat the previous passing real-inference/browser run as validation of this new code.
-- The next verification must pass the full `test` job and `real-inference-smoke` job, including the licensed-footage Streamlit browser journey and artifact validation. Exact run ID and results will be recorded after completion.
+- Implementation commit: `bda72a0a67ff485a79e381e6da7378d954df1f96`.
+- GitHub Actions run [41308755104](https://github.com/ahpa5246-lgtm/Sports-Vision-Analyst/actions/runs/41308755104) passed on this exact PR #2 head; both `test` and `real-inference-smoke` jobs completed successfully.
+- `python -m pytest`: 15 passed, 2 skipped. `python -m compileall sports_vision app.py`: passed.
+- Real model smoke: YOLO26n + ByteTrack on CPU, 8 generated frames, 2,930-byte result bundle, peak RSS 1,197,674,496 bytes.
+- Streamlit browser journey: 16 licensed-footage frames processed and 67 tracking rows; downloads were tracking.csv 4,889 bytes, summary.json 2,545 bytes and annotated.webm 207,327 bytes. Video playback reached 0.5137 s at 1440×1000 and 0.5078 s at 768×900, both with `readyState=4` and no media error. A rerun preserved the result and the narrow page had no horizontal overflow.
+- Artifact [13084338209](https://github.com/ahpa5246-lgtm/Sports-Vision-Analyst/actions/runs/41308755104/artifacts/13084338209) (625,232 bytes) was downloaded; I inspected the actual desktop and narrow results screenshots. The UI is unchanged by this analytics-only milestone.
 
 ### Remaining limits
 - This guard protects accumulator state from malformed or out-of-order samples; it does not establish detector/tracker accuracy, player identity, full-match validity, or measurement calibration accuracy.
 - The existing PR #3 still contains the same guard on its separate branch. Keep both PRs unmerged until the duplicate review path is reconciled; do not copy this fix elsewhere.
+
+
+### Remaining acceptance after the verified guard
+- The P1 accumulator-state corruption path is covered and green on PR #2. This does not establish full-match detector/tracker accuracy, player identity, calibration accuracy, or representative camera robustness.
+- The separate PR #3 still carries the same guard/test patch as of its inspected head. Reconcile it to a documentation-only scope so the implementation and regression tests exist once in the active feature branch.
+- In-app calibration, event timeline, manual telestration, synchronized side-by-side comparison, screen-reader/keyboard audit and full-match ground-truth evaluation remain open.
