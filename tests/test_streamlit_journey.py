@@ -149,9 +149,9 @@ def test_streamlit_real_football_upload_results_downloads_and_reruns(tmp_path: P
                     expect(page.locator('[data-testid="stDataFrame"]')).to_be_visible()
                     frame_slider = page.get_by_role("slider", name="Frame index")
                     expect(frame_slider).to_be_visible()
-                    initial_frame = await frame_slider.get_attribute("aria-valuenow")
-                    await frame_slider.focus()
-                    await page.keyboard.press("ArrowRight")
+                    initial_frame = frame_slider.get_attribute("aria-valuenow")
+                    frame_slider.focus()
+                    page.keyboard.press("ArrowRight")
                     expect(frame_slider).not_to_have_attribute("aria-valuenow", initial_frame)
                     page.screenshot(
                         path=str(evidence_dir / "frame-review-desktop.png"),
