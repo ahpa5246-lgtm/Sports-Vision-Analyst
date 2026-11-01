@@ -110,7 +110,7 @@ Useful knobs:
 streamlit run app.py
 ```
 
-Upload the video and calibration JSON, choose model/tracker/device, run the pipeline, preview the annotated result, and download the generated files.
+Upload the video and calibration JSON, choose model/tracker/device, run the pipeline, then switch between annotated-video playback and frame review. Frame review provides a zero-based frame/time scrubber, the tracks recorded on the selected frame, and per-track team, speed, distance, pitch position and confidence details. Track IDs are temporary tracker labels, not verified player identities. Download the generated files when the review is complete.
 
 ## Docker
 

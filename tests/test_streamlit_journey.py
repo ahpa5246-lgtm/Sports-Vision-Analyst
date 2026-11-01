@@ -142,6 +142,24 @@ def test_streamlit_real_football_upload_results_downloads_and_reruns(tmp_path: P
                         full_page=True,
                     )
 
+                    page.get_by_role("radio", name="Frame review").check()
+                    expect(page.get_by_text("Selected frame", exact=True)).to_be_visible()
+                    expect(page.get_by_text("Tracked objects on this frame", exact=True)).to_be_visible()
+                    expect(page.get_by_role("combobox", name="Track ID")).to_be_visible()
+                    expect(page.locator('[data-testid="stDataFrame"]')).to_be_visible()
+                    frame_slider = page.get_by_role("slider", name="Frame index")
+                    expect(frame_slider).to_be_visible()
+                    initial_frame = await frame_slider.get_attribute("aria-valuenow")
+                    await frame_slider.focus()
+                    await page.keyboard.press("ArrowRight")
+                    expect(frame_slider).not_to_have_attribute("aria-valuenow", initial_frame)
+                    page.screenshot(
+                        path=str(evidence_dir / "frame-review-desktop.png"),
+                        full_page=True,
+                    )
+                    page.get_by_role("radio", name="Video playback").check()
+                    expect(video_player).to_have_count(1)
+
                     page.get_by_text("Calibration guide", exact=True).click()
                     expect(
                         page.get_by_text("Map the pitch before measuring movement", exact=True)
@@ -182,6 +200,20 @@ def test_streamlit_real_football_upload_results_downloads_and_reruns(tmp_path: P
                         path=str(evidence_dir / "results-narrow.png"),
                         full_page=True,
                     )
+
+                    page.get_by_role("radio", name="Frame review").check()
+                    expect(page.get_by_text("Selected frame", exact=True)).to_be_visible()
+                    expect(page.get_by_role("combobox", name="Track ID")).to_be_visible()
+                    expect(page.locator('[data-testid="stDataFrame"]')).to_be_visible()
+                    frame_review_narrow_overflow = page.evaluate(
+                        "() => document.documentElement.scrollWidth > window.innerWidth"
+                    )
+                    assert not frame_review_narrow_overflow, "Frame review introduced horizontal overflow at 768px."
+                    page.screenshot(
+                        path=str(evidence_dir / "frame-review-narrow.png"),
+                        full_page=True,
+                    )
+                    page.get_by_role("radio", name="Video playback").check()
 
                     def save_download(label: str, filename: str) -> Path:
                         target = tmp_path / filename
@@ -228,12 +260,16 @@ def test_streamlit_real_football_upload_results_downloads_and_reruns(tmp_path: P
                         "narrow_video_playback": narrow_playback,
                         "rerun_preserved_result": True,
                         "narrow_horizontal_overflow": bool(narrow_overflow),
+                        "frame_review_narrow_horizontal_overflow": bool(frame_review_narrow_overflow),
+                        "frame_review_verified": True,
                         "viewports": ["1440x1000", "768x900"],
                         "screenshots": [
                             "analyze-uploaded.png",
                             "analyze-complete.png",
                             "results-desktop.png",
+                            "frame-review-desktop.png",
                             "results-narrow.png",
+                            "frame-review-narrow.png",
                             "results-cleared.png",
                         ],
                     }
