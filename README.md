@@ -1,5 +1,35 @@
 # Sports Vision Analyst
 
+## Download, setup and project overview
+
+Single-camera football tracking and pitch-coordinate analytics.
+
+Player and ball tracks; homography; team assignment; speed, distance and possession summaries.
+
+![Project workflow illustration](docs/project-overview.svg)
+
+[Download source ZIP](https://github.com/ahpa5246-lgtm/Sports-Vision-Analyst/archive/refs/heads/main.zip) · [Changes and branches](https://github.com/ahpa5246-lgtm/Sports-Vision-Analyst/branches) · [Verification notes](docs/QUALITY_REVIEW.md)
+
+The ZIP contains source code. Installation steps and external runtime requirements are listed below.
+
+```bash
+git clone https://github.com/ahpa5246-lgtm/Sports-Vision-Analyst.git
+cd Sports-Vision-Analyst
+```
+
+From the repository directory:
+
+```text
+python -m venv .venv
+# Activate .venv before installing packages.
+python -m pip install -r requirements.txt
+python -m pip install -e ".[dev]"
+sports-vision --help
+```
+
+The diagram is a project illustration. Test results and runtime limitations are recorded in [the review](docs/QUALITY_REVIEW.md); it is not a production-readiness certification.
+
+
 A working single-camera football analytics pipeline. It detects and tracks players and the ball, maps image positions to real pitch coordinates with homography, estimates player speed and distance, classifies the two teams by jersey color, estimates possession and common formations, optionally exports pose keypoints, and renders a tactical mini-map over the source video.
 
 ## What it produces
