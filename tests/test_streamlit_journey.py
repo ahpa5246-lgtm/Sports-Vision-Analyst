@@ -86,6 +86,11 @@ def test_streamlit_real_football_upload_results_downloads_and_reruns(tmp_path: P
                     page.goto("http://127.0.0.1:8501", wait_until="domcontentloaded")
                     expect(page.get_by_role("heading", name="Sports Vision Analyst")).to_be_visible()
 
+                    def select_review_mode(label: str) -> None:
+                        group = page.get_by_role("radiogroup", name="Review mode")
+                        group.get_by_text(label, exact=True).click()
+                        expect(group.get_by_role("radio", name=label)).to_be_checked()
+
                     upload_inputs = page.locator('input[type="file"]')
                     expect(upload_inputs).to_have_count(2)
                     upload_inputs.nth(0).set_input_files(str(video_path))
@@ -142,7 +147,7 @@ def test_streamlit_real_football_upload_results_downloads_and_reruns(tmp_path: P
                         full_page=True,
                     )
 
-                    page.get_by_role("radio", name="Frame review").check()
+                    select_review_mode("Frame review")
                     expect(page.get_by_text("Selected frame", exact=True)).to_be_visible()
                     expect(page.get_by_text("Tracked objects on this frame", exact=True)).to_be_visible()
                     expect(page.get_by_role("combobox", name="Track ID")).to_be_visible()
@@ -157,7 +162,7 @@ def test_streamlit_real_football_upload_results_downloads_and_reruns(tmp_path: P
                         path=str(evidence_dir / "frame-review-desktop.png"),
                         full_page=True,
                     )
-                    page.get_by_role("radio", name="Video playback").check()
+                    select_review_mode("Video playback")
                     expect(video_player).to_have_count(1)
 
                     page.get_by_text("Calibration guide", exact=True).click()
