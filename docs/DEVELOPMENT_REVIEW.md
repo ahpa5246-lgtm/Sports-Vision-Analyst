@@ -203,6 +203,29 @@ PR #2 remained Draft and was not ready for measurement-integrity sign-off at tha
 ### Repair and pending evidence
 - Replaced both remaining direct radio `.check()` calls in the narrow journey with `select_review_mode(...)`, which clicks the visible option label and asserts the selected radio state.
 - The journey still verifies Frame review content, Track ID selection, dataframe visibility, and no horizontal overflow at 768px.
-- **Validation pending:** the new commit must pass the full unit/compile job, real inference smoke, and the complete Streamlit browser journey. Do not mark this repair green until the new run and its screenshot artifact are inspected.
+- **Validation completed:** current head `005a5943445521f08f9fdd8d1884c33b44e5aa2d` passed both CI jobs in run [41326576964](https://github.com/ahpa5246-lgtm/Sports-Vision-Analyst/actions/runs/41326576964); the browser artifact was downloaded and inspected. See the final verification entry below.
 
 No merge or deployment. Keep PR #2 Draft.
+
+
+## 2026-11-01 — narrow Frame review repair verified on the current PR #2 head
+
+### Current-head CI
+- Final test commit: `005a5943445521f08f9fdd8d1884c33b44e5aa2d`.
+- GitHub Actions run [41326576964](https://github.com/ahpa5246-lgtm/Sports-Vision-Analyst/actions/runs/41326576964) completed successfully on that exact head. Both `test` and `real-inference-smoke` jobs passed; the previously failing browser step **Exercise upload, analysis, results, reruns and downloads in Streamlit** is green.
+- Unit job: `python -m pytest` and `python -m compileall sports_vision app.py` passed.
+- Real inference: YOLO26n + ByteTrack on CPU processed 8 frames; evidence bundle 2,930 bytes; peak RSS 1,196,224,512 bytes.
+- Evidence artifact [13091785768](https://github.com/ahpa5246-lgtm/Sports-Vision-Analyst/actions/runs/41326576964/artifacts/13091785768), 957,511 bytes, SHA-256 `4321557b199d2c58851bc12f6a83eb9f7236b54d41867055a86eff35a7dd2377`, is bound to the tested PR head.
+
+### Actual browser acceptance
+- The Streamlit journey completed upload, analysis, results, video playback, Frame review, calibration-guide navigation, rerun persistence, CSV/JSON/video downloads, and clear-results behavior.
+- The real-footage run processed 16 frames and produced 67 tracking rows. Downloads: tracking CSV 4,888 bytes, summary JSON 2,545 bytes, annotated WebM 207,327 bytes.
+- Video playback advanced 0.5205 seconds at 1440×1000 and 0.5087 seconds at 768×900; both reported `readyState=4` with no media error.
+- Frame review verified the selected-frame heading, frame slider, Track ID control, tracking table, and keyboard interaction. Both 768px results and Frame review reported no horizontal overflow; rerun preserved the result.
+- Downloaded and inspected `frame-review-narrow.png` (768×900) and the desktop/narrow results captures. The narrow screenshot shows the selected Frame review state, frame index control and tracking table; the page remains vertically scrollable without horizontal clipping.
+
+### Product comparison and remaining gaps
+- [Hudl Sportscode](https://www.hudl.com/products/sportscode) is the direct team-analysis reference for customizable performance analysis and linked replay/telestration workflows. [Kinovea](https://kinovea.org/features.html) provides frame/time navigation, annotation, measurement, and synchronized two-video comparison. [FIFA Football Data Platform](https://inside.fifa.com/innovation/innovating-the-game/football-data-platform) is the official visual/data reference for unified match events, statistics, and video synchronized with events.
+- The current app's real workflow is still Analyze → Results → Video playback/Frame review. It now verifies the frame-review path, but it still lacks an event timeline, manual telestration, synchronized side-by-side video comparison, and in-app calibration editing. Do not claim parity with Hudl or Kinovea.
+- This repair changed only the browser test and review record, not production UI or analytics. Measurement-integrity guard remains in PR #2; the earlier failure run [41323604500](https://github.com/ahpa5246-lgtm/Sports-Vision-Analyst/actions/runs/41323604500) is superseded by the successful current-head run above.
+- Keep PR #2 Draft. No merge, deployment, release, or model-accuracy claim.
