@@ -179,6 +179,7 @@ PR #2 remained Draft and was not ready for measurement-integrity sign-off at tha
 - Real model smoke: YOLO26n + ByteTrack on CPU, 8 generated frames, 2,930-byte result bundle, peak RSS 1,197,674,496 bytes.
 - Streamlit browser journey: 16 licensed-footage frames processed and 67 tracking rows; downloads were tracking.csv 4,889 bytes, summary.json 2,545 bytes and annotated.webm 207,327 bytes. Video playback reached 0.5137 s at 1440×1000 and 0.5078 s at 768×900, both with `readyState=4` and no media error. A rerun preserved the result and the narrow page had no horizontal overflow.
 - Artifact [13084338209](https://github.com/ahpa5246-lgtm/Sports-Vision-Analyst/actions/runs/41308755104/artifacts/13084338209) (625,232 bytes) was downloaded; I inspected the actual desktop and narrow results screenshots. The UI is unchanged by this analytics-only milestone.
+- The subsequent review-document head `f01bc1f34a4fbb41dabd0582864ceefa80e85367` passed CI run [41309065068](https://github.com/ahpa5246-lgtm/Sports-Vision-Analyst/actions/runs/41309065068); both declared jobs passed.
 
 ### Remaining limits
 - This guard protects accumulator state from malformed or out-of-order samples; it does not establish detector/tracker accuracy, player identity, full-match validity, or measurement calibration accuracy.
@@ -187,5 +188,5 @@ PR #2 remained Draft and was not ready for measurement-integrity sign-off at tha
 
 ### Remaining acceptance after the verified guard
 - The P1 accumulator-state corruption path is covered and green on PR #2. This does not establish full-match detector/tracker accuracy, player identity, calibration accuracy, or representative camera robustness.
-- The separate PR #3 still carries the same guard/test patch as of its inspected head. Reconcile it to a documentation-only scope so the implementation and regression tests exist once in the active feature branch.
+- PR #3 was subsequently narrowed to documentation-only at head `56120d305a51b429ccd444b133cd438eaf467419`; `sports_vision/analytics.py` now matches `main`, and `tests/test_measurement_integrity.py` is absent from that branch. Its current-head CI run [41309250371](https://github.com/ahpa5246-lgtm/Sports-Vision-Analyst/actions/runs/41309250371) passed. The guard and regression tests now exist only on this active feature branch.
 - In-app calibration, event timeline, manual telestration, synchronized side-by-side comparison, screen-reader/keyboard audit and full-match ground-truth evaluation remain open.
