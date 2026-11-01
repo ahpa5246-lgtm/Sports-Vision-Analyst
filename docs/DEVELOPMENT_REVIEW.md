@@ -157,3 +157,25 @@ This run verifies pipeline execution and the short browser journey, not full-mat
 
 ### Gate decision
 PR #2 remains Draft and is not ready for measurement-integrity sign-off. The passing CI above verifies the current declared jobs only; it does not close this P1 data-integrity blocker. No merge, deployment or duplicate implementation was performed.
+
+
+## 2026-11-01 — measurement integrity guard integrated into PR #2
+
+### Branch reconciliation
+- PR #2 was reviewed at head `31d0eae1992eb0dcbd28d7d47fc3a415bd1fd7bb`; its `PlayerAccumulator.update` still mutated the previous sample without finite-value or monotonic-time validation.
+- Existing Draft PR #3 (`2e0810061d24fa2c9312c94c47df092b444da45b`) already contained the minimal guard and a regression test, but also carried separate README, quality-review and illustration changes.
+- Only the measurement guard and its regression coverage were transferred to the existing PR #2 branch. No new branch or PR was created, and the unrelated PR #3 documentation/illustration changes were not copied.
+
+### Implementation
+- Reject a sample unless its timestamp and both coordinates are finite.
+- Reject timestamps that are not strictly later than the previous accepted sample.
+- Perform both checks before changing team, sample count, previous position/time, distance, or speed state.
+- Regression tests cover NaN/positive infinity timestamps, NaN/infinite coordinates, out-of-order samples, and preservation of the last accepted tracking state.
+
+### Verification
+- Code and test commit created on `codex/persistent-analysis-workspace`; branch-head CI is pending at the time of this entry. Do not treat the previous passing real-inference/browser run as validation of this new code.
+- The next verification must pass the full `test` job and `real-inference-smoke` job, including the licensed-footage Streamlit browser journey and artifact validation. Exact run ID and results will be recorded after completion.
+
+### Remaining limits
+- This guard protects accumulator state from malformed or out-of-order samples; it does not establish detector/tracker accuracy, player identity, full-match validity, or measurement calibration accuracy.
+- The existing PR #3 still contains the same guard on its separate branch. Keep both PRs unmerged until the duplicate review path is reconciled; do not copy this fix elsewhere.
