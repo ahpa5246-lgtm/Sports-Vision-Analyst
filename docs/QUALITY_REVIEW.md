@@ -15,7 +15,7 @@ No application source or test behavior is changed by this documentation-only bra
 | Check | Observed result |
 | --- | --- |
 | Previous maintenance-branch unit run | 7 passed on the earlier snapshot; not evidence for PR #2 |
-| Documentation-only branch CI | Pending after the scope reconciliation commit |
+| Documentation-only branch CI | Run [41309113399](https://github.com/ahpa5246-lgtm/Sports-Vision-Analyst/actions/runs/41309113399): passed on the scope-reconciliation head; 3 tests passed and `compileall` completed |
 
 ## Limits and next validation
 
