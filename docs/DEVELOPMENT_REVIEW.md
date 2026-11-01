@@ -133,3 +133,27 @@ This run verifies pipeline execution and the short browser journey, not full-mat
 - No in-app calibration editor, event timeline, manual annotation, synchronized side-by-side comparison, or screen-reader/keyboard audit is established by this artifact.
 - The screenshots verify the tested Streamlit journey only. They do not pass the full comparative visual-quality gate or establish release readiness.
 - No merge or deployment.
+
+
+## 2026-11-01 — measurement-integrity dependency and current-head verification
+
+### Current PR-head CI
+- Reviewed PR #2 at head `4bf78a950a0168f89407241b0504a76634912c4c`; it remains open and Draft.
+- GitHub Actions PR run [41265928286](https://github.com/ahpa5246-lgtm/Sports-Vision-Analyst/actions/runs/41265928286) completed successfully on that head.
+- The `test` job passed dependency installation, Pytest and `compileall`. The `real-inference-smoke` job passed YOLO26n + ByteTrack CPU inference and the licensed-footage Streamlit browser journey through upload, analysis, results, reruns and downloads.
+- Artifact [13067345876](https://github.com/ahpa5246-lgtm/Sports-Vision-Analyst/actions/runs/41265928286/artifacts/13067345876) was uploaded (625,212 bytes; SHA-256 `0376d91b581833ef1c20a2990a3c1cfd6228187ec53d8e41872557cd738073c3`).
+- Passing inference and browser checks do not establish measurement-integrity coverage; the issue below is not exercised by those jobs.
+
+### Confirmed P1 measurement-integrity blocker
+- Re-read `sports_vision/analytics.py` at PR #2 head. `PlayerAccumulator.update` still increments `samples` and overwrites `last_position` / `last_time_s` without first rejecting non-finite timestamps/coordinates or non-increasing timestamps.
+- A NaN/Inf sample can poison the previous-sample state; an out-of-order sample can rewind it. The next valid interval may then be skipped or calculated from an invalid baseline.
+- The exact issue is already recorded in the owner's [PR #2 review comment](https://github.com/ahpa5246-lgtm/Sports-Vision-Analyst/pull/2#issuecomment-6553391611).
+
+### Existing fix — do not duplicate
+- Open Draft PR [#3](https://github.com/ahpa5246-lgtm/Sports-Vision-Analyst/pull/3), branch `codex/portfolio-quality-2026-10-25`, head `2e0810061d24fa2c9312c94c47df092b444da45b`, already rejects non-finite and out-of-order samples and adds `tests/test_measurement_integrity.py`.
+- PR #3 CI [40200781849](https://github.com/ahpa5246-lgtm/Sports-Vision-Analyst/actions/runs/40200781849) passed.
+- PR #3 also changes `README.md`, adds `docs/QUALITY_REVIEW.md` and `docs/project-overview.svg`; it is not a two-file patch that can be blindly merged into PR #2.
+- Do not copy the guard/tests into PR #2 while the existing PR #3 remains the source of the same fix. Reconcile the two existing branches so the guard and regression tests land exactly once, then rerun the unit suite, real-inference smoke and Streamlit browser acceptance on the resulting PR #2 head.
+
+### Gate decision
+PR #2 remains Draft and is not ready for measurement-integrity sign-off. The passing CI above verifies the current declared jobs only; it does not close this P1 data-integrity blocker. No merge, deployment or duplicate implementation was performed.
