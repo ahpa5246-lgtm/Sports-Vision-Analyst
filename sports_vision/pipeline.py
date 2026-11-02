@@ -88,16 +88,26 @@ class SportsVisionPipeline:
         height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
         total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT) or 0)
 
-        annotated_path = output_dir / "annotated.mp4"
-        writer = cv2.VideoWriter(
-            str(annotated_path),
-            cv2.VideoWriter_fourcc(*"mp4v"),
-            fps,
-            (width, height),
-        )
-        if not writer.isOpened():
+        annotated_path = output_dir / "annotated.webm"
+        writer = None
+        for codec in ("VP90", "VP80"):
+            candidate = cv2.VideoWriter(
+                str(annotated_path),
+                cv2.VideoWriter_fourcc(*codec),
+                fps,
+                (width, height),
+            )
+            if candidate.isOpened():
+                writer = candidate
+                break
+            candidate.release()
+            annotated_path.unlink(missing_ok=True)
+        if writer is None:
             cap.release()
-            raise RuntimeError("Could not initialize MP4 writer. Install an OpenCV/FFmpeg build with MP4 support.")
+            raise RuntimeError(
+                "Could not initialize a browser-compatible WebM writer. "
+                "Install an OpenCV/FFmpeg build with VP9 or VP8 encoding support."
+            )
 
         analytics = MatchAnalytics(self.config.max_player_speed_kmh)
         classifier = TeamColorClassifier(outlier_distance=self.config.team_outlier_distance)

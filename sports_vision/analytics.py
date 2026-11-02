@@ -21,6 +21,10 @@ class PlayerAccumulator:
     samples: int = 0
 
     def update(self, time_s: float, position: tuple[float, float], team: int = 0) -> None:
+        if not all(math.isfinite(value) for value in (time_s, *position)):
+            return
+        if self.last_time_s is not None and time_s <= self.last_time_s:
+            return
         if team:
             self.team = team
         self.samples += 1

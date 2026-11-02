@@ -6,7 +6,7 @@ A working single-camera football analytics pipeline. It detects and tracks playe
 
 For every analyzed match the pipeline writes:
 
-- `annotated.mp4` — tracked players, IDs, team, speed and tactical mini-map.
+- `annotated.webm` — browser-playable VP9/VP8 video with tracked players, IDs, team, speed and tactical mini-map.
 - `tracking.csv` — frame/time/track/team/metric x-y/speed/distance/confidence/bounding box.
 - `summary.json` — team distance, possession estimate, player totals/top speed and dominant formation.
 - `team_1_heatmap.png`, `team_2_heatmap.png` — spatial occupancy heatmaps when team samples exist.
@@ -110,7 +110,7 @@ Useful knobs:
 streamlit run app.py
 ```
 
-Upload the video and calibration JSON, choose model/tracker/device, run the pipeline, preview the annotated result, and download the generated files.
+Upload the video and calibration JSON, choose model/tracker/device, run the pipeline, then switch between annotated-video playback and frame review. Frame review provides a zero-based frame/time scrubber, the tracks recorded on the selected frame, and per-track team, speed, distance, pitch position and confidence details. Track IDs are temporary tracker labels, not verified player identities. Download the generated files when the review is complete.
 
 ## Docker
 
@@ -139,7 +139,16 @@ pip install -e ".[dev]"
 python -m pytest
 ```
 
-The unit tests cover metric homography, speed/distance accumulation with impossible-jump rejection, and formation estimation.
+The unit tests cover metric homography, speed/distance accumulation with impossible-jump rejection, formation estimation, and detached result bundles.
+
+Run the bounded real-model smoke test explicitly (it downloads `yolo26n.pt`, generates an eight-frame MP4, runs ByteTrack on CPU, validates the downloadable bundle after temporary cleanup, and prints peak RSS evidence):
+
+```bash
+pip install -e ".[vision,dev]"
+RUN_REAL_INFERENCE=1 python -m pytest -s -m integration tests/test_real_inference.py
+```
+
+This is pipeline plumbing evidence, not football detection-accuracy or full-match performance evidence.
 
 ## Project layout
 
