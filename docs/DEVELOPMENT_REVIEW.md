@@ -252,3 +252,29 @@ No merge or deployment. Keep PR #2 Draft.
 - The existing direct-product comparison remains [Hudl Sportscode](https://www.hudl.com/products/sportscode) and [Kinovea](https://www.kinovea.org/features.html), with the [FIFA Football Data Platform](https://inside.fifa.com/innovation/innovating-the-game/football-data-platform) as the official event/video reference. This CI maintenance change does not alter the UI and does not close the event-timeline, manual-telestration, synchronized-comparison, in-app-calibration, accessibility, or full-match ground-truth gaps.
 
 Keep PR #2 Draft. No merge, deployment, release, or model-accuracy claim.
+
+
+
+## 2026-11-02 — remove deprecated Streamlit container-width argument
+
+### Failure-first evidence
+- Current PR #2 head before this stage: `ca7695cbaf8da94a59971627b0b1924166f9f395`.
+- Current-head CI [41372193995](https://github.com/ahpa5246-lgtm/Sports-Vision-Analyst/actions/runs/41372193995) completed successfully for both `test` and `real-inference-smoke`. The migrated checkout v7, setup-python v6 and upload-artifact v7 actions produced no Node.js 20 action-runtime deprecation warning.
+- The real Streamlit log in artifact [13109353477](https://github.com/ahpa5246-lgtm/Sports-Vision-Analyst/actions/runs/41372193995/artifacts/13109353477) did show the framework's deprecation warning: replace `use_container_width=True` with `width="stretch"`. The warning repeated across reruns. The only two occurrences in the 20 Python source/test files were in `app.py`, for the selected-frame image and tracked-object dataframe; the other 19 Python files contained none.
+- The same log recorded an OpenCV VP90/WebM codec warning. Browser playback nevertheless completed successfully; retain that warning as a separate decoder/toolchain observation, not a failed playback result.
+
+### Bounded implementation
+- Replace the two deprecated `use_container_width=True` arguments in `app.py` with `width="stretch"`, matching Streamlit's own migration guidance.
+- No data processing, model, tracker, calibration, session state, page routing, or layout structure is intentionally changed. The image and dataframe remain stretched to the available content width.
+
+### Baseline acceptance before this change
+- `python -m pytest`: 18 passed, 2 skipped; `python -m compileall sports_vision app.py`: passed.
+- Real smoke: YOLO26n + ByteTrack on CPU, 8 generated frames, 2,930-byte output bundle, peak RSS 1,197,199,360 bytes.
+- Licensed-footage Streamlit journey: 16 frames processed, 67 tracking rows; CSV 4,889 bytes, JSON 2,545 bytes, annotated WebM 207,327 bytes. Video playback advanced 0.5163 s at 1440×1000 and 0.5235 s at 768×900, both with `readyState=4` and no media error. Rerun preserved results; Results and Frame review had no horizontal overflow at 768px.
+- Actual `frame-review-desktop.png` and `frame-review-narrow.png` were downloaded and inspected. The desktop capture shows the frame slider and annotated frame; the narrow capture shows the selected-frame state and tracking table without horizontal clipping. The narrow screen still has a large title and vertically stacked table; this maintenance change does not claim a visual redesign.
+
+### Validation pending
+- This commit contains the implementation and its review record. The exact new PR-head CI must pass both jobs, and its Streamlit log must no longer contain the `use_container_width` warning, before the migration is marked verified.
+- The existing comparison remains [Hudl Sportscode](https://www.hudl.com/products/sportscode) and [Kinovea](https://www.kinovea.org/features.html), with the [FIFA Football Data Platform](https://inside.fifa.com/innovation/innovating-the-game/football-data-platform) as the official match-data/video reference. Event timeline, manual telestration, synchronized side-by-side video, in-app calibration, accessibility review and full-match ground-truth evaluation remain open.
+
+Keep PR #2 Draft. No merge, deployment, release, or model-accuracy claim.

@@ -162,7 +162,7 @@ else:
                         st.image(
                             frame_image,
                             caption=f"Frame {frame_index} · {frame_time:.3f} s",
-                            use_container_width=True,
+                            width="stretch",
                         )
                     except Exception as exc:
                         st.error(f"Could not decode frame {frame_index}: {exc}")
@@ -185,7 +185,7 @@ else:
                                 "distance_m": "Distance (m)",
                             }
                         )
-                        st.dataframe(frame_table, hide_index=True, use_container_width=True)
+                        st.dataframe(frame_table, hide_index=True, width="stretch")
 
                         track_ids = sorted(
                             int(value)
