@@ -278,3 +278,29 @@ Keep PR #2 Draft. No merge, deployment, release, or model-accuracy claim.
 - The existing comparison remains [Hudl Sportscode](https://www.hudl.com/products/sportscode) and [Kinovea](https://www.kinovea.org/features.html), with the [FIFA Football Data Platform](https://inside.fifa.com/innovation/innovating-the-game/football-data-platform) as the official match-data/video reference. Event timeline, manual telestration, synchronized side-by-side video, in-app calibration, accessibility review and full-match ground-truth evaluation remain open.
 
 Keep PR #2 Draft. No merge, deployment, release, or model-accuracy claim.
+
+
+## 2026-11-02 — Streamlit width migration verified on current PR #2 head
+
+### Exact-head CI result
+- Application implementation commit: `f9e6188ca9fcae9953209f5442103ec11e23f88d`.
+- GitHub Actions run [41379328557](https://github.com/ahpa5246-lgtm/Sports-Vision-Analyst/actions/runs/41379328557) completed successfully on that exact PR branch head. Both `test` and `real-inference-smoke` jobs passed.
+- The `test` job reported `18 passed, 2 skipped`; `python -m compileall sports_vision app.py` also passed.
+- The real model smoke used YOLO26n + ByteTrack on CPU, processed 8 generated frames, and produced a 2,930-byte evidence bundle. Recorded peak RSS was 1,195,708,416 bytes; this is a GitHub-runner observation, not a hosting recommendation.
+- The Streamlit browser journey completed with licensed footage: 16 frames processed and 67 tracking rows. Downloads were `tracking.csv` (4,888 bytes), `summary.json` (2,545 bytes), and `annotated.webm` (207,327 bytes). Rerun preserved the result.
+- Video playback advanced 0.5114 seconds at 1440×1000 and 0.5119 seconds at 768×900; both reported `readyState=4` and no media error. Results and Frame review both reported no horizontal overflow at 768px; Frame review was verified.
+- The two deprecated `use_container_width=True` call sites are now `width="stretch"` in `app.py`; a branch-source scan found exactly those two stretch arguments and no remaining `use_container_width` occurrence.
+- The migrated GitHub actions ran as checkout v7, setup-python v6 and upload-artifact v7. No Node.js 20 action-runtime deprecation warning appeared in this run. The workflow did emit a separate Ultralytics runtime-refresh notice; it did not fail inference or browser acceptance.
+
+### Artifact and visual inspection
+- Evidence artifact [13112945607](https://github.com/ahpa5246-lgtm/Sports-Vision-Analyst/actions/runs/41379328557/artifacts/13112945607) contains 11 files, is 953,367 bytes, and has SHA-256 `89e3be1096d2844f76bd3e0fd777029714d6566a21bda4717d8668fc39c12fc0`. Its metadata binds it to branch `codex/persistent-analysis-workspace` and implementation commit `f9e6188ca9fcae9953209f5442103ec11e23f88d`.
+- Downloaded and inspected the actual Analyze, Results and Frame review screenshots at desktop and narrow sizes, plus the cleared-results state. The upload → analysis → Results → playback/Frame review → rerun/download/clear journey is evidenced; this is not inferred from a modal or success message.
+- The desktop Results capture shows the annotated video and pitch overlay as the dominant surface, with aggregate metrics below. The narrow capture remains usable without horizontal overflow but stacks the video and metrics vertically and retains a large page title. Frame review exposes the frame slider and tracked-object table, but not a synchronized event timeline or manual telestration.
+- The only media warning in the retained Streamlit log is OpenCV's VP90/WebM encoder-tag warning. Playback still completed in both tested viewports with no media error. Keep this as a separate codec/toolchain issue; do not describe it as a playback failure.
+
+### Comparator decision and remaining gaps
+- Rechecked the existing released-product references: [Hudl Sportscode](https://www.hudl.com/products/sportscode) for linked analysis/replay/telestration, [Kinovea](https://www.kinovea.org/features.html) for frame navigation, measurement and synchronized comparison, and the official [FIFA Football Data Platform](https://inside.fifa.com/innovation/innovating-the-game/football-data-platform) as the match-data/video reference.
+- The current workflow is still Analyze → Results → Video playback/Frame review. The Calibration guide remains instructional rather than an in-app calibration editor. Event timeline, manual telestration, synchronized side-by-side video, in-app calibration, screen-reader/keyboard review and full-match ground-truth evaluation remain open. The screenshots do not establish detector/tracker accuracy or parity with Hudl/Kinovea.
+- This maintenance change closes the Streamlit deprecation warning only. No application layout, analytics, model, tracker or calibration behavior changed.
+
+Keep PR #2 Draft. No merge, deployment, release, or model-accuracy claim.
