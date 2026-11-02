@@ -229,3 +229,26 @@ No merge or deployment. Keep PR #2 Draft.
 - The current app's real workflow is still Analyze → Results → Video playback/Frame review. It now verifies the frame-review path, but it still lacks an event timeline, manual telestration, synchronized side-by-side video comparison, and in-app calibration editing. Do not claim parity with Hudl or Kinovea.
 - This repair changed only the browser test and review record, not production UI or analytics. Measurement-integrity guard remains in PR #2; the earlier failure run [41323604500](https://github.com/ahpa5246-lgtm/Sports-Vision-Analyst/actions/runs/41323604500) is superseded by the successful current-head run above.
 - Keep PR #2 Draft. No merge, deployment, release, or model-accuracy claim.
+
+
+## 2026-11-02 — migrate CI actions to Node 24-compatible releases
+
+### Failure-first evidence
+- Existing PR #2 head before this maintenance stage: `a163fd8a952717c3647cb5be2be3e98d6f32a9ca`.
+- PR CI run [41327147864](https://github.com/ahpa5246-lgtm/Sports-Vision-Analyst/actions/runs/41327147864) completed successfully for both `test` and `real-inference-smoke` jobs, but both job logs emitted GitHub's Node.js 20 action-runtime deprecation warning. The warning names `actions/checkout@v4`, `actions/setup-python@v5`, and `actions/upload-artifact@v4`; it is a maintenance warning, not an application-test failure.
+- Python 3.11, the application dependencies, model smoke, licensed-footage browser journey and artifact contract are unchanged by this stage.
+
+### Bounded workflow change
+- `actions/checkout` is updated from v4 to v7.
+- `actions/setup-python` is updated from v5 to v6.
+- `actions/upload-artifact` is updated from v4 to v7.
+- Official action metadata was inspected at [checkout v7.0.1](https://github.com/actions/checkout/releases/tag/v7.0.1), [setup-python v6](https://github.com/actions/setup-python/releases/tag/v6.0.0), and [upload-artifact v7.0.2](https://github.com/actions/upload-artifact/releases/tag/v7.0.2); each JavaScript action declares `runs.using: node24`.
+- No application source, Python version, dependency, test command, model, calibration, or deployment workflow was changed.
+
+### Validation pending
+- Documentation checkpoint: this entry records the observed warning and the planned bounded action migration.
+- The following workflow-only commit is the implementation checkpoint. Its exact PR-head CI must pass both jobs, including real YOLO26n + ByteTrack CPU inference and the Streamlit upload → analysis → results → rerun → download journey.
+- Do not call this migration verified until the exact-head CI logs show no Node.js 20 action-runtime warning and the evidence artifact is inspected.
+- The existing direct-product comparison remains [Hudl Sportscode](https://www.hudl.com/products/sportscode) and [Kinovea](https://www.kinovea.org/features.html), with the [FIFA Football Data Platform](https://inside.fifa.com/innovation/innovating-the-game/football-data-platform) as the official event/video reference. This CI maintenance change does not alter the UI and does not close the event-timeline, manual-telestration, synchronized-comparison, in-app-calibration, accessibility, or full-match ground-truth gaps.
+
+Keep PR #2 Draft. No merge, deployment, release, or model-accuracy claim.
